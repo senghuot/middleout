@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Upload</title>
+</head>
+<body>
+    <h1>Complex Type</h1>
+    <form id="form1" method="post" action="api/updates/complexion"
+          enctype="application/x-www-form-urlencoded">
+        <div>
+            <label for="status">Status</label>
+        </div>
+        <div>
+            <input name="status" type="text" />
+        </div>
+        <div>
+            <label for="date">Date</label>
+        </div>
+        <div>
+            <input name="date" type="text" />
+        </div>
+        <div>
+            <input type="submit" value="Submit" />
+        </div>
+        <div id="message"></div>
+    </form>    
+
+    <script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
+    <script type="text/javascript">
+        $("#form1").submit(function () {
+            var jqxhr = $.post('api/updates/complexion', $('#form1').serialize())
+                .success(function (response) {
+                    console.log(response);
+                    var loc = jqxhr.getResponseHeader('Location');
+                    var a = $('<a/>', { href: loc, text: loc });
+                    $('#message').html(a);
+                })
+                .error(function () {
+                    $('#message').html("Error posting the update.");
+                });
+            return false;
+        });
+    </script>
+    
+</body>
+</html>
