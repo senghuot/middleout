@@ -12,8 +12,10 @@ using System.IO;
 namespace ProductsApp.Controllers {
     public class UploadController : ApiController {
         
+   
         [HttpPost]
-        public async Task<HttpResponseMessage> Upload() {
+        public async Task<HttpResponseMessage> post() {
+            Trace.WriteLine("Hell Yeah");
             // check if the request contains multipart/form-data
             if (!Request.Content.IsMimeMultipartContent())
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
@@ -21,50 +23,23 @@ namespace ProductsApp.Controllers {
             // grab the relative path to "App_Data"
             string root = HttpContext.Current.Server.MapPath("~/App_Data");
             var provider = new CustomMultipartFormDataStreamProvider(root);
-
             try {
-                var result = await Request.Content.ReadAsMultipartAsync(provider);
+                var result      = await Request.Content.ReadAsMultipartAsync(provider);
+                var filename    = result.FormData["resumableFilename"];
+                var chunkNumber = result.FormData["resumableChunkNumber"];
+                var totalChunk  = result.FormData["resumableTotalChunk"];
+                // This illustrates how to get the file names.
+                foreach (MultipartFileData file in provider.FileData) {
 
+                    Trace.WriteLine("We're here ");
+                }      
                 return Request.CreateResponse(HttpStatusCode.OK);
-            } catch (System.Exception e) {
+            } 
+            catch (System.Exception e) 
+            {
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
-
-
-        //[HttpPost]
-        //public HttpResponseMessage> post() {
-        //    // check if the request contains multipart/form-data
-        //    if (!Request.Content.IsMimeMultipartContent())
-        //        throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
-
-        //    // grab the relative path to "App_Data"
-        //    string root = HttpContext.Current.Server.MapPath("~/App_Data");
-        //    var provider = new CustomMultipartFormDataStreamProvider(root);
-        //    try {
-        //        var result = Request.Content.ReadAsMultipartAsync(provider).Result;
-        //        //Console.WriteLine(result.FormData[0]);
-        //        // This illustrates how to get the file names.
-        //        foreach (MultipartFileData fileData in provider.FileData) {
-        //            if (string.IsNullOrEmpty(fileData.Headers.ContentDisposition.FileName)) {
-        //                return Request.CreateResponse(HttpStatusCode.NotAcceptable, "This request is not properly formatted");
-        //            }
-        //            string fileName = fileData.Headers.ContentDisposition.FileName;
-        //            if (fileName.StartsWith("\"") && fileName.EndsWith("\"")) {
-        //                fileName = fileName.Trim('"');
-        //            }
-        //            if (fileName.Contains(@"/") || fileName.Contains(@"\")) {
-        //                fileName = Path.GetFileName(fileName);
-        //            }
-        //            File.Move(fileData.LocalFileName, Path.Combine(root, fileName));
-        //        }      
-        //        return Request.CreateResponse(HttpStatusCode.OK);
-        //    } 
-        //    catch (System.Exception e) 
-        //    {
-        //        return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
-        //    }
-        //}
 
         /*public async Task<HttpResponseMessage> PostFormData() {
             
