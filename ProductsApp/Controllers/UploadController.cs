@@ -22,77 +22,54 @@ namespace ProductsApp.Controllers {
                 throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
 
             // grab the relative path to "App_Data"
-            string root = HttpContext.Current.Server.MapPath("~/App_Data");
-            var provider = new CustomMultipartFormDataStreamProvider(root);
+            string tmpRoot  = HttpContext.Current.Server.MapPath("~/Tmp_Data");
+            string root     = HttpContext.Current.Server.MapPath("~/App_Data");
+            // write the n-chunks to the tmp folder for now
+            var provider    = new CustomMultipartFormDataStreamProvider(tmpRoot);
             try {
                 var result      = await Request.Content.ReadAsMultipartAsync(provider);
                 var filename    = result.FormData["resumableFilename"];
-                var chunkNumber = result.FormData["resumableChunkNumber"];
-                var totalChunk  = result.FormData["resumableTotalChunks"];
-                
+                var chunkNumber = int.Parse(result.FormData["resumableChunkNumber"]);
+                var totalChunk  = int.Parse(result.FormData["resumableTotalChunks"]);
+
                 // This illustrates how to get the file names.
                 foreach (MultipartFileData file in provider.FileData) {
-                    string tmpFilename =  String.Format("{0}//{1}-{2}-{3}", root, chunkNumber, totalChunk, filename);
+                    // it is important to sort the filename accordingly. there might be more efficient method but i will
+                    // figure this part later
+                    string tmpFilename =  String.Format("{0}//{1:D3}-{2}-{3}", tmpRoot, chunkNumber, totalChunk, filename);
                     System.IO.File.Move(file.LocalFileName, tmpFilename);
                 }
                 
                 // check if all the files had been saved
                 if (chunkNumber == totalChunk) {
-                    var loop = true;
-                    string[] files = null;
-                    while (loop) {
-                        files = System.IO.Directory.GetFiles(root);
-                        loop = !(files.Length == int.Parse(totalChunk));
-                        Thread.Sleep(2000);
-                    }
-                    Trace.WriteLine("All the chunks had been uploaded");
-                    var fs = new FileStream(root + "//" + filename, FileMode.CreateNew);
-                    var sortedfiles = files.OrderBy(n => n);
-                    foreach (var file in sortedfiles) {
-                        var buffer = System.IO.File.ReadAllBytes(file);
-                        fs.Write(buffer, 0, buffer.Length);
-                        System.IO.File.Delete(file);
-                    }
-                    fs.Close();
+                    new Thread(delegate() {
+                        Thread.Sleep(10000);
+                        string[] files = null;
+                        while (true) {
+                            files = System.IO.Directory.GetFiles(tmpRoot);
+                            if (files.Length == totalChunk)
+                                break;
+                            else
+                                Thread.Sleep(2000);
+                        }
+                        // at this point all the chunks had been written already so now we will combine them
+                        var fs = new FileStream(root + "//" + filename, FileMode.CreateNew);
+                        foreach (var file in files) {
+                            var buffer = System.IO.File.ReadAllBytes(file);
+                            fs.Write(buffer, 0, buffer.Length);
+                            System.IO.File.Delete(file);
+                        }
+                        fs.Close();
+                    }).Start();
                 }
 
+                // need to return for n-1 packages back.
                 return Request.CreateResponse(HttpStatusCode.OK);
             } 
             catch (System.Exception e) {
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
         }
-
-        /*public async Task<HttpResponseMessage> PostFormData() {
-            
-            // check if the request contains multipart/form-data
-            if (!Request.Content.IsMimeMultipartContent())
-                throw new HttpResponseException(HttpStatusCode.UnsupportedMediaType);
-
-            string root = HttpContext.Current.Server.MapPath("~/App_Data");
-            var provider = new MultipartFormDataStreamProvider(root);
-
-            string path = @"C:/middleout/ProductsApp/App_Data/";
-            try {
-                // Read the form data
-                await Request.Content.ReadAsMultipartAsync(provider);
-                // This illustrates how to get the file names.
-                foreach (MultipartFileData file in provider.FileData) {
-                    // grab the original filename but needs to remove the first 2 and last characters
-                    var filename    = file.Headers.ContentDisposition.FileName;
-                    filename        = filename.Substring(1, filename.Length - 2);
-
-                    // need to file the tmp filename to replace with the original filename
-                    // this could be dangerous because files could overwrite each other.
-                    var tmpFilename = file.LocalFileName.Substring(file.LocalFileName.LastIndexOf("\\") + 1);
-                    System.IO.File.Move(path + tmpFilename, path + filename);
-                }
-
-                return Request.CreateResponse(HttpStatusCode.OK);
-            } catch (System.Exception e) {
-                return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e); 
-            }
-        }*/
     }
 
     public class CustomMultipartFormDataStreamProvider : MultipartFormDataStreamProvider {
