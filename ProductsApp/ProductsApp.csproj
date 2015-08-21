@@ -72,10 +72,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="cancel.png" />
     <Content Include="Global.asax" />
     <Content Include="index.html" />
-    <Content Include="index2.html" />
-    <Content Include="upload.html" />
+    <Content Include="pause.png" />
+    <Content Include="resumable.js" />
+    <Content Include="resume.png" />
+    <Content Include="style.css" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>
