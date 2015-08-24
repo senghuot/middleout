@@ -26,7 +26,7 @@ namespace ProductsApp.Controllers {
             // grab the relative path to "App_Data"
             string tmpRoot  = HttpContext.Current.Server.MapPath("~/Tmp_Data");
             //string tmpRoot  = "F:/Tmp_Data";
-            string root     = HttpContext.Current.Server.MapPath("~/App_Data");
+            string root     = HttpContext.Current.Server.MapPath("~/Files");
             // write the n-chunks to the tmp folder for now
             var provider    = new MultipartFormDataStreamProvider(tmpRoot);
             try {

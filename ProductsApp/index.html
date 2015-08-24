@@ -91,7 +91,7 @@
                 });
 
                 $('.file').on('click', function () {
-                    window.open('http://www.google.com', '_blank');
+                    window.open('http://localhost:3000/files/' + $(this).html(), '_blank');
                 });
             });
             r.on('fileError', function (file, message) {

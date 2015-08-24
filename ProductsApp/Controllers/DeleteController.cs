@@ -12,7 +12,7 @@ namespace ProductsApp.Controllers {
         [HttpGet]
         public HttpResponseMessage ClearAll() {
             string tmpRoot = HttpContext.Current.Server.MapPath("~/Tmp_Data");
-            string root = HttpContext.Current.Server.MapPath("~/App_Data");
+            string root = HttpContext.Current.Server.MapPath("~/Files");
             string[] tmpFiles = System.IO.Directory.GetFiles(tmpRoot);
             foreach (var file in tmpFiles)
                 System.IO.File.Delete(file);
@@ -28,7 +28,7 @@ namespace ProductsApp.Controllers {
         [HttpGet]
         public HttpResponseMessage ClearOne(string filename) {
             string tmpRoot = HttpContext.Current.Server.MapPath("~/Tmp_Data");
-            string root = HttpContext.Current.Server.MapPath("~/App_Data");
+            string root = HttpContext.Current.Server.MapPath("~/Files");
             string[] tmpFiles = System.IO.Directory.GetFiles(tmpRoot);
             string[] files = System.IO.Directory.GetFiles(root);
 
