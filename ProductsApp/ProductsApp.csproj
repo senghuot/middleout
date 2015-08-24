@@ -83,6 +83,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\DeleteController.cs" />
     <Compile Include="Controllers\ProductsController.cs" />
     <Compile Include="Controllers\UpdatesController.cs" />
     <Compile Include="Controllers\UploadController.cs" />

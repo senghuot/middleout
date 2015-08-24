@@ -49,3 +49,21 @@ body {text-align:center; margin:40px;}
 .is-error .uploader-item:hover, .is-active.is-error .uploader-item {border-color:#900;}
 .is-error .uploader-item:hover .uploader-item-title, .is-active.is-error .uploader-item .uploader-item-title {background-color:rgba(153,0,0,0.6);}
 .is-error .uploader-item-creating-thumbnail {display:none;}
+
+/* custom */
+.files li {
+    padding: 10px;
+    font-size: 15px;
+    color: green;
+    font-weight: bold;
+}
+
+.file {
+    cursor: pointer;
+}
+
+.delete {
+    color: red;
+    margin-left: 10px;
+    cursor: pointer;
+}

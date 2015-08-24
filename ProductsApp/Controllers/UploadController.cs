@@ -15,6 +15,8 @@ namespace ProductsApp.Controllers {
         // to lock the thread while seeking file information
         private static Dictionary<string, int> counter = new Dictionary<string, int>();
    
+        /*
+         */
         [HttpPost]
         public async Task<HttpResponseMessage> post() {
             // check if the request contains multipart/form-data
@@ -89,17 +91,6 @@ namespace ProductsApp.Controllers {
             catch (System.Exception e) {
                 return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, e);
             }
-        }
-    }
-
-    public class CustomMultipartFormDataStreamProvider : MultipartFormDataStreamProvider {
-	    public CustomMultipartFormDataStreamProvider(string path) : base(path){}
-
-        public override string GetLocalFileName(System.Net.Http.Headers.HttpContentHeaders headers) {
-            var name = !string.IsNullOrWhiteSpace(headers.ContentDisposition.FileName) ? headers.ContentDisposition.FileName : "NoName";
-            //this is here because Chrome submits files in quotation marks which get treated as part of the filename and get escaped
-            return name.Replace("\"", string.Empty);
-            //return "okay";
         }
     }
 }
