@@ -35,19 +35,21 @@ namespace ProductsApp.Controllers {
                 var chunkNumber = int.Parse(result.FormData["resumableChunkNumber"]);
                 var totalChunk  = int.Parse(result.FormData["resumableTotalChunks"]);
 
-                // This illustrates how to get the file names.
-                foreach (MultipartFileData file in provider.FileData) {
-                    // it is important to sort the filename accordingly. there might be more efficient method but i will
-                    // figure this part later
+                new Thread(delegate() { 
+                    // This illustrates how to get the file names.
+                    foreach (MultipartFileData file in provider.FileData) {
+                        // it is important to sort the filename accordingly. there might be more efficient method but i will
+                        // figure this part later
 
-                    string tmpFilename = String.Format("{0}\\{1:D7}-{2}-{3}", tmpRoot , chunkNumber, totalChunk, filename);
-                    System.IO.File.Move(file.LocalFileName, tmpFilename);
-                    lock (counter) {
-                        if (!counter.ContainsKey(filename))
-                            counter.Add(filename, 0);
-                        counter[filename]++;
+                        string tmpFilename = String.Format("{0}\\{1:D7}-{2}-{3}", tmpRoot , chunkNumber, totalChunk, filename);
+                        System.IO.File.Move(file.LocalFileName, tmpFilename);
+                        lock (counter) {
+                            if (!counter.ContainsKey(filename))
+                                counter.Add(filename, 0);
+                            counter[filename]++;
+                        }
                     }
-                }
+                }).Start();
                 
                 // check if all the files had been saved
                 if (chunkNumber == totalChunk) {
